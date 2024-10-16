@@ -4,33 +4,26 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'docker build -t myapp .'
+                // Use bat instead of sh for Windows
+                bat 'npm install'
             }
         }
         stage('Test') {
             steps {
-                // Run unit tests
-                sh 'npm test'
+                bat 'npm test'
             }
         }
         stage('Deploy') {
             steps {
-                // Push the Docker image to a container registry
-                sh 'docker tag myapp myregistry/myapp:latest'
-                sh 'docker push myregistry/myapp:latest'
-                // Optionally, deploy to your cloud infrastructure
-                // Example for AWS: 
-                // sh 'aws ecs update-service --cluster my-cluster --service my-service --force-new-deployment'
+                echo 'Deploying the application...'
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline completed successfully.'
-        }
-        failure {
-            echo 'Pipeline failed.'
-        }
-    }
+        always {
+            echo 'Cleaning up workspace...'
+            cleanWs()
+        }
+    }
 }
